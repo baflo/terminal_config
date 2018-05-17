@@ -15,4 +15,6 @@ colorscheme monokai
 :command! Rdate exec 'normal i'.substitute(" ".system("date +%Y-%m-%d"),"[\n]*$","","")
 
 " Set key mappings
+map <C-o> :NERDTreeToggle<CR>
 map <Leader>. :Rdate<CR>
+tnoremap <Esc>  <C-\><C-n>
