@@ -48,6 +48,9 @@ Plug 'tpope/vim-speeddating'
 " Adds some nice extra's for working with md docs
 Plug 'SidOfc/mkdx'
 
+" Clickable links
+Plug 'gu-fan/clickable.vim'
+
 Plug 'itchyny/lightline.vim'
 
 " Initialize plugin system
