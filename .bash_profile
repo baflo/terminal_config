@@ -14,7 +14,11 @@
 #
 #---------------------------------------------------------------------------------------------------------------------------------------
 
-BASH_CONFIG_GIT_PATH="https://raw.githubusercontent.com/baflo/terminal_config/master/"
+GIT_PROJECT="baflo/terminal_config"
+BASH_CONFIG_GIT_PATH="https://raw.githubusercontent.com/$GIT_PROJECT/master/"
+BASH_CONFIG_GIT_INFO="https://api.github.com/repos/$GIT_PROJECT/commits/master"
+
+BASH_CONFIG_REV_FILE=~/.config/bash_config_rev
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 #   1.  ENVIRONMENT SETUP
@@ -60,29 +64,37 @@ WHITE="\[$white\]"
 WHITEB="\[$whiteb\]"
 
 # Config
-upgrade_bash_profile() {
-  wget -O ~/.bash_profile "$BASH_CONFIG_GIT_PATH/.bash_profile"
-  . ~/.bash_profile
+latest_config_rev () {
+  local result=$(curl $BASH_CONFIG_GIT_INFO 2> /dev/null)
+  echo $(echo $result | sed 's/.*\"sha\"\: \"\([0-9a-z]*\)\",.*/\1/')
+}
+
+new_bash_config_available() {
+  local remote_rev=$(latest_config_rev)
+  local local_rev=$(if [[ -f $BASH_CONFIG_REV_FILE ]]; then cat $BASH_CONFIG_REV_FILE; fi)
+
+  if [[ $remote_rev != $local_rev ]]
+  then
+    echo $remote_rev
+  fi
 }
 
 # Register script for installing own tools
 upgrade_bash_tools() {
-  local fn=~/bash_install.sh.tmp
-  wget -O "$fn" "$BASH_CONFIG_GIT_PATH/bash_install.sh"
+  . <(curl "$BASH_CONFIG_GIT_PATH/bash_install.sh")
+}
 
-  if [[ $? == 0 ]]
+upgrade_bash_profile() {
+  local remote_rev=$(new_bash_config_available)
+  if [[ -z $remote_rev ]]
   then
-    local newhash=$(sha1sum "$fn" | awk '{ print $1 }')
-    local oldhash=$(cat ~/.config/bash_install.sh.sha1)
-
-    if [[ $newhash != $oldhash ]]
-    then
-      echo $newhash > ~/.config/bash_install.sh.sha1
-      . "$fn"
-    fi
+    echo -e "${yellow}Bash config up to date."
+  else
+    wget -O ~/.bash_profile "$BASH_CONFIG_GIT_PATH/.bash_profile"
+    echo -n $remote_rev > $BASH_CONFIG_REV_FILE
+#    . ~/.bash_profile
+    upgrade_bash_tools
   fi
-
-  rm "$fn"
 }
 
 # Get Git branch of current directory
