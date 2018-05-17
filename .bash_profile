@@ -67,21 +67,22 @@ upgrade_bash_profile() {
 
 # Register script for installing own tools
 upgrade_bash_tools() {
-  wget -O /tmp/bash_install.sh "$BASH_CONFIG_GIT_PATH/bash_install.sh"
+  local fn=~/bash_install.sh.tmp
+  wget -O "$fn" "$BASH_CONFIG_GIT_PATH/bash_install.sh"
 
   if [[ $? == 0 ]]
   then
-    local newhash=sha1sum /tmp/bash_install.sh | awk '{ print $1 }'
-    local oldhash=$(< ~/.config/bash_install.sh.sha1)
+    local newhash=$(sha1sum "$fn" | awk '{ print $1 }')
+    local oldhash=$(cat ~/.config/bash_install.sh.sha1)
 
-    if [[ newhash != oldhash ]]
+    if [[ $newhash != $oldhash ]]
     then
       echo $newhash > ~/.config/bash_install.sh.sha1
-      sudo /tmp/bash_install.sh
+      . "$fn"
     fi
-
-    rm /tmp/bash_install.sh
   fi
+
+  rm "$fn"
 }
 
 # Get Git branch of current directory
