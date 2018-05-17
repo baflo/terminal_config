@@ -451,9 +451,6 @@ function gitpall {
             echo -e "${yellow}Exit without committing..."
             return
         fi
-    else
-        echo -e "${yellow}Nothing to commit..."
-        return
     fi
 
     # Check remote status
