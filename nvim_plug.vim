@@ -45,11 +45,8 @@ Plug 'scrooloose/nerdcommenter'
 " Increment/Decrement dates (Ctrl-a, Ctrl-x)
 Plug 'tpope/vim-speeddating'
 
-" Aliging (used by vim-markdown)
-Plug 'godlygeek/tabular'
-
-" Markdown features (<Leader>ft)
-Plug 'gabrielelana/vim-markdown'
+" Adds some nice extra's for working with md docs
+Plug 'SidOfc/mkdx'
 
 " Initialize plugin system
 call plug#end()
