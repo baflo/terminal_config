@@ -17,7 +17,7 @@ if [[ "$REPLY" =~ [yY] ]]
 then
 	PRE_UPDATE_PKGS+=("software-properties-common")
 	PRE_UPDATE_REPOS+=("ppa:neovim-ppa/stable")
-	POST_UPDATE_PKGS+=("neovim")
+	POST_UPDATE_PKGS+=("neovim editorconfig")
 	POST_INSTALL_CMDS+=("mkdir -p ~/.config/nvim/autoload && curl_nc_tf https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim ~/.config/nvim/autoload/plug.vim && curl_nc_tf $BASH_CONFIG_GIT_PATH/nvim_init.vim ~/.config/nvim/init.vim && curl_nc_tf $BASH_CONFIG_GIT_PATH/nvim_plug.vim  ~/.config/nvim/nvim_plug.vim && nvim -u ~/.config/nvim/nvim_plug.vim -c ':PlugInstall' -c ':qa'")
 fi
 
