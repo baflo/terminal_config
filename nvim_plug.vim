@@ -12,5 +12,7 @@ Plug 'godlygeek/tabular'
 Plug 'gabrielelana/vim-markdown'
 Plug 'thanthese/markdown-outline'
 
+Plug 'itchyny/lightline.vim'
+
 " Initialize plugin system
 call plug#end()
