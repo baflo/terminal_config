@@ -14,7 +14,7 @@
 #
 #---------------------------------------------------------------------------------------------------------------------------------------
 
-GIST_PATH="https://gist.githubusercontent.com/baflo/7c8438eaaba360a5108da5f7dd1dd286/raw/"
+BASH_CONFIG_GIT_PATH="https://raw.githubusercontent.com/baflo/terminal_config/master/"
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 #   1.  ENVIRONMENT SETUP
@@ -58,6 +58,31 @@ CYAN="\[$cyan\]"
 CYANB="\[$cyanb\]"
 WHITE="\[$white\]"
 WHITEB="\[$whiteb\]"
+
+# Config
+upgrade_bash_profile() {
+  wget -O ~/.bash_profile "$BASH_CONFIG_GIT_PATH/.bash_profile"
+  . ~/.bash_profile
+}
+
+# Register script for installing own tools
+upgrade_bash_tools() {
+  wget -O /tmp/bash_install.sh "$BASH_CONFIG_GIT_PATH/bash_install.sh"
+
+  if [[ $? == 0 ]]
+  then
+    local newhash=sha1sum /tmp/bash_install.sh | awk '{ print $1 }'
+    local oldhash=$(< ~/.config/bash_install.sh.sha1)
+
+    if [[ newhash != oldhash ]]
+    then
+      echo $newhash > ~/.config/bash_install.sh.sha1
+      sudo /tmp/bash_install.sh
+    fi
+
+    rm /tmp/bash_install.sh
+  fi
+}
 
 # Get Git branch of current directory
 git_upstream_target() {
@@ -251,12 +276,6 @@ mkzip() { zip -r "${1%%/}.zip" "$1" ; }               # Create a *.zip archive o
 #---------------------------------------------------------------------------------------------------------------------------------------
 #   4.  MISC ALIAS'
 #---------------------------------------------------------------------------------------------------------------------------------------
-
-# Config
-function upgrade_bash_profile {
-  wget -O ~/.bash_profile "$GIST_PATH/.bash_profile"
-  . ~/.bash_profile
-}
 
 # Grunt
 alias gw='grunt watch'    # Start the Grunt "watch" task
@@ -473,18 +492,6 @@ function gitpall {
 #   7.  TAB COMPLETION
 #---------------------------------------------------------------------------------------------------------------------------------------
 
-# # Add tab completion for many Bash commands
-# if which brew > /dev/null && [ -f "$(brew --prefix)/share/bash-completion/bash_completion" ]; then
-#     source "$(brew --prefix)/share/bash-completion/bash_completion";
-# elif [ -f /etc/bash_completion ]; then
-#     source /etc/bash_completion;
-# fi;
-#
-# # Add tab completion for vagrant commands
-# if [ -f `brew --prefix`/etc/bash_completion.d/vagrant ]; then
-#     source `brew --prefix`/etc/bash_completion.d/vagrant
-# fi
-
 # Add `killall` tab completion for common apps
 complete -o "nospace" -W "Contacts Calendar Dock Finder Mail Safari iTunes SystemUIServer Terminal" killall;
 
@@ -574,64 +581,4 @@ create() {
 }
 
 
-# Ask only if this is a new install
-DEV_BASH_PROFILE_APP_MGR=
-BPAMV=~/.config/bash_profile_app_mgr_version
-create $BPAMV
-BASH_PROFILE_APP_MGR_VERSION=$(cat $BPAMV | tr "\n" " " || 0)
-LATEST_BASH_PROFILE_APP_MGR_VERSION=8
-if [[ "$BASH_PROFILE_APP_MGR_VERSION" -lt "$LATEST_BASH_PROFILE_APP_MGR_VERSION" ]] || [ ! -z $DEV_BASH_PROFILE_APP_MGR ]
-then
-	echo "New version is being installed..."
-	echo $LATEST_BASH_PROFILE_APP_MGR_VERSION > $BPAMV
-	PRE_UPDATE_PKGS=()
-	PRE_UPDATE_REPOS=()
-	POST_UPDATE_PKGS=()
-	POST_INSTALL_CMDS=()
-
-	if [ ! -f nvim ]
-	then
-		function askYN() {
-			echo -ne "${yellow}Install/upgrade $1?${white} [y/n]: "
-			read -n 1 -r
-			echo
-		}
-
-		# Setup installation of neovim
-		askYN neovim
-		if [[ "$REPLY" =~ [yY] ]]
-		then
-			PRE_UPDATE_PKGS+=("software-properties-common")
-			PRE_UPDATE_REPOS+=("ppa:neovim-ppa/stable")
-			POST_UPDATE_PKGS+=("neovim")
-			POST_INSTALL_CMDS+=("mkdir -p ~/.config/nvim/autoload && curl_nc_tf https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim ~/.config/nvim/autoload/plug.vim && curl_nc_tf $GIST_PATH/nvim_init.vim ~/.config/nvim/init.vim && curl_nc_tf $GIST_PATH/nvim_plug.vim  ~/.config/nvim/nvim_plug.vim && nvim -u ~/.config/nvim/nvim_plug.vim -c ':PlugInstall' -c ':qa'")
-		fi
-
-		# Setup installation of tmux
-		askYN tmux
-		if [[ "$REPLY" =~ [yY] ]]
-		then
-			POST_UPDATE_PKGS+=("tmux")
-			POST_INSTALL_CMDS+=("curl_nc_tf $GIST_PATH/.tmux.conf ~/.tmux.conf")
-		fi
-
-                # Setup installation of notes
-                askYN notes
-                if [[ "$REPLY" =~ [yY] ]]
-                then
-                    POST_UPDATE_PKGS+=("make")
-                    POST_INSTALL_CMDS+=("curl -L https://rawgit.com/pimterry/notes/latest-release/install.sh | bash && mkdir -p ~/.config/notes && curl_nc_tf $GIST_PATH/notes_config ~/.config/notes/config && curl https://cdn.rawgit.com/pimterry/notes/latest-release/notes.bash_completion | sudo tee /usr/share/bash-completion/completions/notes > /dev/null")
-                fi
-
-		if [ ! -z ${PRE_UPDATE_PKGS[0]}  ] ; then sudo apt-get -y install ${PRE_UPDATE_PKGS[@]}; fi
-		if [ ! -z ${PRE_UPDATE_REPOS[0]} ] ; then sudo add-apt-repository -y ${PRE_UPDATE_REPOS[@]}; fi
-		if [ ! -z ${PRE_UPDATE_REPOS[0]} ] ; then sudo apt-get -y update; fi
-		if [ ! -z ${POST_UPDATE_PKGS[0]} ] ; then sudo apt-get -y install ${POST_UPDATE_PKGS[@]}; fi
-
-		for cmd in "${POST_INSTALL_CMDS[@]}"
-		do
-			eval $cmd
-		done
-	fi
-fi
 
