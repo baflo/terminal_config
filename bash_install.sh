@@ -11,6 +11,13 @@ function askYN() {
 	echo
 }
 
+# Setup installation of docker-machine config for WSL
+askYN docker-machine-WSL
+if [[ "$REPLY" =~ [yY] ]]
+then
+	POST_INSTALL_CMDS+=("curl https://raw.githubusercontent.com/baflo/terminal_config/master/.bash_docker_cfg > ~/.bash_docker_cfg")
+fi
+
 # Setup installation of neovim
 askYN neovim
 if [[ "$REPLY" =~ [yY] ]]
