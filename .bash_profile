@@ -215,6 +215,11 @@ ulimit -n 10240
 # Print the date
 date
 
+# Load docker-machine config
+if [ -f ~/.bash_docker_cfg ]
+then
+	. ~/.bash_docker_cfg
+fi
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 #   2.  MAKE TERMINAL BETTER
