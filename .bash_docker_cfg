@@ -1,0 +1,15 @@
+# Docker (Docker Toolbox on Windows)
+
+if [ ! -f ~/.bin/docker-env ]
+then
+  mkdir ~/.bin
+  curl https://raw.githubusercontent.com/baflo/terminal_config/master/docker-env > ~/.bin/docker-env
+  chmod +x ~/.bin/docker-env
+fi
+
+source <(~/.bin/docker-env)
+alias docker-machine="docker-machine.exe"
+#alias docker="docker.exe" # Native docker client is used instead, less issues with environment variables
+docker-machine.exe start default && # autostart docker-machine
+# docker-compose path compatibility
+export COMPOSE_CONVERT_WINDOWS_PATHS=1
