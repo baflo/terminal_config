@@ -282,6 +282,7 @@ cleardir() {
     done
 }
 
+pwdfrom() { echo $(realpath --relative-to $1 $(pwd)); } # Print current working directory relative to other path
 mktar() { tar cvzf "${1%%/}.tar.gz"  "${1%%/}/"; }    # Creates a *.tar.gz archive of a file or folder
 mkzip() { zip -r "${1%%/}.zip" "$1" ; }               # Create a *.zip archive of a file or folder
 
