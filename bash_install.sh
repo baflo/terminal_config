@@ -18,6 +18,20 @@ then
 	POST_INSTALL_CMDS+=("curl https://raw.githubusercontent.com/baflo/terminal_config/master/.bash_docker_cfg > ~/.bash_docker_cfg")
 fi
 
+# Setup installation of docker client for WSL
+askYN docker-client
+if [[ "$REPLY" =~ [yY] ]]
+then
+	POST_UPDATE_PKGS+=("docker.io")
+fi
+
+# Setup installation of make
+askYN make
+if [[ "$REPLY" =~ [yY] ]]
+then
+	POST_UPDATE_PKGS+=("make")
+fi
+
 # Setup installation of neovim
 askYN neovim
 if [[ "$REPLY" =~ [yY] ]]
