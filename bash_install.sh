@@ -25,6 +25,13 @@ then
 	POST_UPDATE_PKGS+=("docker.io")
 fi
 
+# Setup node version manager
+askYN nvm
+if [[ "$REPLY" =~ [yY] ]]
+then
+	POST_INSTALL_CMDS+=("curl -o- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash")
+fi
+
 # Setup installation of make
 askYN make
 if [[ "$REPLY" =~ [yY] ]]
